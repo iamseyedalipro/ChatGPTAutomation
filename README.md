@@ -1,86 +1,66 @@
-## Project Overview
+# ChatGPTAutomation
 
-This project, named "ChatGPT Automation", leverages Selenium WebDriver to automate interactions with OpenAI's ChatGPT. It provides a comprehensive set of functionalities, including sending messages, uploading files, handling chat sessions, and managing browser instances. This tool is especially useful for automating tasks, testing, or data collection from ChatGPT.
+## Description
+ChatGPTAutomation is a Python package designed to automate interactions with ChatGPT using Selenium. It simplifies the process of sending prompts, managing responses, and handling files in the ChatGPT interface, making it an ideal tool for developers and testers who require automated ChatGPT interactions.
 
 ## Features
-
-- **Automated Chat Interaction**: Send prompts to ChatGPT and retrieve responses programmatically.
-- **File Upload Capability**: Automate the process of uploading files to ChatGPT.
-- **Conversation Management**: Save entire conversations, start new chats, and delete existing chats.
-- **Error Handling**: Detect and handle errors during chat interactions.
-- **Human Verification Support**: Pause automation for manual human verification steps.
-- **Clipboard Integration**: Copy and retrieve ChatGPT responses via the clipboard.
-- **Remote Browser Control**: Utilize remote debugging to control an existing Chrome browser session.
-- **Logging**: Detailed logging for troubleshooting and analysis.
+- Automated sending of messages to ChatGPT.
+- Support for file uploads to ChatGPT.
+- Retrieval and storage of ChatGPT conversations.
+- Customizable WebDriver settings for browser management.
 
 ## Installation
-
-### Prerequisites
-
-- Python 3.x
-- Selenium WebDriver
-- Chrome Browser
-- Chromedriver (compatible with your Chrome version)
-
-### Setup
-
-1. Clone the repository:
-   ```bash
-   git clone [repository-url]
-   ```
-
-2. Install required Python packages:
-   ```bash
-   pip install selenium
-   pip install pyperclip
-   ```
-
-3. Ensure Chrome and Chromedriver are installed and compatible.
+To install ChatGPTAutomation, simply run:
+```bash
+pip install ChatGPTAutomation
+```
 
 ## Usage
+Import the package and use it in your Python scripts as follows:
+```python
+from chatgpt_automation import ChatGPTAutomation
 
-1. **Initialization**: Create an instance of `ChatGPTAutomation` class.
-   ```python
-   from chatgpt_automation import ChatGPTAutomation
+# Initialize with path to Chrome and ChromeDriver
+chat_bot = ChatGPTAutomation(chrome_path="path/to/chrome.exe", chrome_driver_path="path/to/chromedriver.exe")
 
-   automation = ChatGPTAutomation(chrome_path="path_to_chrome.exe",
-                                  chrome_driver_path="path_to_chromedriver.exe")
-   ```
+# Example: Sending a prompt
+chat_bot.send_prompt_to_chatgpt("Hello, ChatGPT!")
 
-2. **Sending Prompts**: Use `send_prompt_to_chatgpt` to send messages.
-   ```python
-   automation.send_prompt_to_chatgpt("Hello, ChatGPT!")
-   ```
+# Retrieve and save conversation
+chat_bot.save_conversation("conversation.txt")
+```
 
-3. **Uploading Files**: Use `upload_file_for_prompt` to upload files.
-   ```python
-   automation.upload_file_for_prompt("example.txt")
-   ```
+Send file with prompt:
+```python
+chat_bot.upload_file_for_prompt("test_file.txt")
+chat_bot.send_prompt_to_chatgpt("Please explain to me what is in this file?")
+```
+check_response_status function:
+```python
+if chat_bot.check_response_status():
+    print("Response is ready and complete.")
+    # You can now proceed to retrieve or process the response.
+else:
+    print("There was an issue in generating the response.")
+```
 
-4. **Managing Conversations**: Save, delete, or start new chats using respective methods.
-   ```python
-   automation.save_conversation("chat_log.txt")
-   automation.del_current_chat()
-   automation.open_new_chat()
-   ```
+get the last response using return_last_response function:
+```python
+chat_bot.send_prompt_to_chatgpt("Hello, ChatGPT!")
+response = chat_bot.return_last_response()
+```
 
-5. **Closing Session**: Properly close the browser and WebDriver session.
-   ```python
-   automation.quit()
-   ```
-
-## Contributing
-
-Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
+## Requirements
+- Python 3.8 or higher
+- Selenium==4.9.0
+- Other dependencies can be found in `requirements.txt`
 
 ## License
+This project is licensed under the MIT License - see the [LICENCE.md](LICENCE.md) file for details.
 
-This project is licensed under the [MIT License](LICENSE.md).
+## Contact
+For questions or feedback, please contact Seyed Ali Hosseini at iamseyedalipro@gmail.com.
 
-## Support and Contact
-
-If you encounter any issues or have questions, please [open an issue](https://github.com/your-repository/issues) on GitHub.
-
----
-
-*Note: This project is not affiliated with OpenAI. It's a community-driven project intended for educational purposes.*
+## Acknowledgements
+- OpenAI for ChatGPT
+- Selenium contributors
