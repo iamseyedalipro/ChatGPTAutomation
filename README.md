@@ -18,7 +18,7 @@ pip install ChatGPTAutomation
 ## Usage
 Import the package and use it in your Python scripts as follows:
 ```python
-from chatgpt_automation import ChatGPTAutomation
+from chatgpt_automation.chatgpt_automation import ChatGPTAutomation
 
 # Initialize with path to Chrome and ChromeDriver
 chat_bot = ChatGPTAutomation(chrome_path="path/to/chrome.exe", chrome_driver_path="path/to/chromedriver.exe")
