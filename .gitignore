@@ -5,3 +5,4 @@ chatgpt_automation.log
 ChatGPTAutomation.egg-info/
 build/
 dist/
+mytest/

@@ -264,15 +264,17 @@ class ChatGPTAutomation:
                 os.makedirs(directory_name)
 
             # Define a delimiter for separating conversation parts in the file
-            delimiter = "|^_^|"
+            delimiter = "----------------------------------------"
             # Retrieve the conversation elements from the ChatGPT interface
             chatgpt_conversation = self.return_chatgpt_conversation()
 
+            del chatgpt_conversation[::2]
+
             # Open the file and append the conversation
             with open(os.path.join(directory_name, file_name), "a") as file:
-                for i in range(0, len(chatgpt_conversation), 2):
+                for i in range(0, len(chatgpt_conversation)):
                     file.write(
-                        f"prompt: {chatgpt_conversation[i].text}\nresponse: {chatgpt_conversation[i + 1].text}\n\n{delimiter}\n\n")
+                        f"{chatgpt_conversation[i].text}\n\n{delimiter}\n\n")
         except IOError as e:
             # Log and raise an error if there is an issue writing to the file
             logging.error(f"Failed to write conversation to file: {e}")
