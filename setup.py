@@ -14,11 +14,11 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/iamseyedalipro/ChatGPTAutomation',
     packages=find_packages(),
-    install_requires=requirements,  # Set the requirements here
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Testing Tools',
+        'Topic :: Software Development :: Testing',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
