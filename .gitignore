@@ -1,0 +1,4 @@
+__pycache__/
+venv/
+conversations/
+chatgpt_automation.log
