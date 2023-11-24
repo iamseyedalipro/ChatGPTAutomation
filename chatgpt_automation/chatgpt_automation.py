@@ -196,20 +196,23 @@ class ChatGPTAutomation:
             # Raising a WebDriverException to indicate failure in sending the prompt
             raise webdriver.WebDriverException(f"Error sending prompt to ChatGPT: {e}")
 
-    def upload_file_for_prompt(self, file_path):
+    def upload_file_for_prompt(self, file_name):
         """
         Uploads a file to ChatGPT via the web interface. This function automates the process of
         selecting a file for upload through the ChatGPT's file input element.
 
         Args:
-            file_path (str): The full path of the file to be uploaded.
+            file_name (str): The name of the file to be uploaded.
 
         Raises:
-            FileNotFoundError: If the specified file does not exist.
+            FileNotFoundError: If the specified file does not exist in the current working directory.
             WebDriverException: If there is an issue interacting with the file upload element on the web page.
         """
 
         try:
+            # Construct the full file path using the current working directory
+            file_path = os.path.join(os.getcwd(), file_name)
+
             # Check if the file exists before attempting to upload
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"The file '{file_path}' does not exist.")
@@ -229,7 +232,7 @@ class ChatGPTAutomation:
             # Log any other exception that occurs during the file upload process
             logging.error(f"Failed to upload file to ChatGPT: {e}")
             # Raising a WebDriverException to indicate failure in file upload
-            raise webdriver.WebDriverException(f"Error uploading file to ChatGPT: {e}")
+            raise WebDriverException(f"Error uploading file to ChatGPT: {e}")
 
 
     def return_chatgpt_conversation(self):
