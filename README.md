@@ -1,113 +1,96 @@
-# ChatGPTAutomation
+# ChatGPTAutomation 🤖💻🧠
 
 ## Description
-ChatGPTAutomation is a Python package designed to automate interactions with ChatGPT using Selenium. It simplifies the process of sending prompts, managing responses, and handling files in the ChatGPT interface, making it an ideal tool for developers and testers who require automated ChatGPT interactions.
+ChatGPTAutomation is a Python package that automates interactions with ChatGPT using Selenium, streamlining the process for developers and testers. 🚀
 
 ## Features
-- Automated sending of messages to ChatGPT.
-- Support for file uploads to ChatGPT.
-- Retrieval and storage of ChatGPT conversations.
-- Customizable WebDriver settings for browser management.
+- Automated messaging to ChatGPT. 📩
+- File upload support. 📁
+- ChatGPT conversation retrieval and storage. 🗂️
+- Customizable WebDriver for browser management. 🌐
 
 ## Installation
-To install ChatGPTAutomation, simply run:
+Install with:
 ```bash
 pip install ChatGPTAutomation
 ```
 
 ## Usage
 
-Before using the `ChatGPTAutomation` package, it is essential to download the Chrome WebDriver. The version of the WebDriver must match the version of your Google Chrome browser. 
+**Chrome WebDriver Download**:
 
-For downloading the Chrome WebDriver:
+- **Latest Chrome Version**: Download [here](https://googlechromelabs.github.io/chrome-for-testing/).
+- **Older Chrome Versions**: Find compatible drivers [here](https://chromedriver.chromium.org/downloads).
 
-- **Latest Version of Chrome WebDriver**: 
-  If you are using the latest version of Google Chrome, download the corresponding latest version of Chrome WebDriver from:
-  [Chrome WebDriver - Latest Version](https://googlechromelabs.github.io/chrome-for-testing/)
+**Setup**:
 
-- **Older Versions of Chrome WebDriver**: 
-  If you are using an older version of Google Chrome, find and download the compatible version of Chrome WebDriver from:
-  [Chrome WebDriver - Older Versions](https://chromedriver.chromium.org/downloads)
-
-Ensure that the version of Chrome WebDriver you download matches the version of your Google Chrome browser to avoid compatibility issues. 
----
-### Setup
-The `ChatGPTAutomation` package simplifies the setup process by automatically finding the Chrome executable path and downloading the Chrome WebDriver if needed. You can also manually specify these paths.
-
-For automatic setup, simply initialize `ChatGPTAutomation` without specifying `chrome_path` and `chrome_driver_path`:
-
+Automatic setup (without paths):
 ```python
 from chatgpt_automation.chatgpt_automation import ChatGPTAutomation
 
-# Initialize without specifying paths for automatic setup
 chat_bot = ChatGPTAutomation(
     username="<your username here>", # Optional
     password="<your password here>"  # Optional
 )
 ```
 
-For manual setup, specify the paths to Chrome and ChromeDriver:
-
+Manual setup (with paths):
 ```python
 from chatgpt_automation.chatgpt_automation import ChatGPTAutomation
 
-# Initialize with path to Chrome and ChromeDriver
-chat_bot = ChatGPTAutomation(chrome_path="path/to/chrome.exe", chrome_driver_path="path/to/chromedriver.exe"
+chat_bot = ChatGPTAutomation(chrome_path="path/to/chrome.exe", chrome_driver_path="path/to/chromedriver.exe",
 username="<your username here>", # Optional
 password="<your password here>" # Optional
 )
 
-# Example: Sending a prompt
+# Send prompt
 chat_bot.send_prompt_to_chatgpt("Hello, ChatGPT!")
 
-# Retrieve and save conversation
+# Save conversation
 chat_bot.save_conversation("conversation.txt")
 ```
 
-Send file with prompt:
+File upload:
 ```python
 chat_bot.upload_file_for_prompt("test_file.txt")
-chat_bot.send_prompt_to_chatgpt("Please explain to me what is in this file?")
+chat_bot.send_prompt_to_chatgpt("Explain this file?")
 ```
 
-check_response_status function:
+Check response status:
 ```python
 if chat_bot.check_response_status():
-    print("Response is ready and complete.")
-    # You can now proceed to retrieve or process the response.
+    print("Response ready.")
 else:
-    print("There was an issue in generating the response.")
+    print("Response issue.")
 ```
 
-get the last response using return_last_response function:
+Get last response:
 ```python
 chat_bot.send_prompt_to_chatgpt("Hello, ChatGPT!")
 response = chat_bot.return_last_response()
 ```
 
-switch between the chatgpt models: (In this example, we switched to version 4 you can use 3.5)
+Switch models:
 ```python
 chat_bot.switch_model(4)
 ```
 
-check login page:
+Login check:
 ```python
 if chat_bot.check_login_page():
     chat_bot.login()
 ```
 
-
 ## Requirements
-- Python 3.8 or higher
+- Python 3.8+
 - Selenium==4.9.0
-- Other dependencies can be found in `requirements.txt`
+- See `requirements.txt` for more.
 
 ## License
-This project is licensed under the MIT License - see the [LICENCE.md](LICENCE.md) file for details.
+MIT License - see [LICENCE.md](LICENCE.md).
 
 ## Contact
-For questions or feedback, please contact Seyed Ali Hosseini at iamseyedalipro@gmail.com.
+Seyed Ali Hosseini 🧑‍💻 - iamseyedalipro@gmail.com 📧.
 
 ## Acknowledgements
-- OpenAI for ChatGPT
-- Selenium contributors
+- Thanks to OpenAI and Selenium. 🙏👨‍💻

@@ -95,7 +95,7 @@ class ChatGPTAutomation:
         self.username = username
         self.password = password
 
-        time.sleep(7)
+        time.sleep(6)
 
     def check_login_page(self) -> bool:
         """
@@ -311,8 +311,11 @@ class ChatGPTAutomation:
         :return: returns a list of items, even items are the submitted questions (prompts) and odd items are chatgpt response
         """
 
-        return self.driver.find_elements(*ChatGPTLocators.CHAT_GPT_CONVERSION)
-
+        elements = self.driver.find_elements(*ChatGPTLocators.CHAT_GPT_CONVERSION)
+        del elements[::2]
+        chat_texts = [element.text for element in elements]
+        return chat_texts
+        
     def save_conversation(self, file_name):
         """
         Saves the entire conversation from the ChatGPT interface into a text file. The conversation is formatted
