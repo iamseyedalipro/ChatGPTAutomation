@@ -12,7 +12,9 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.action_chains import ActionChains
 import logging
+import platform
 import pyperclip
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Configure logging
 logging.basicConfig(filename='chatgpt_automation.log', level=logging.INFO,
@@ -52,7 +54,7 @@ class ChatGPTLocators:
     
 
 class ChatGPTAutomation:
-    def __init__(self, chrome_path, chrome_driver_path, username: str = None, password: str=None):
+    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None):
         """
         This constructor automates the following steps:
         1. Open a Chrome browser with remote debugging enabled at a specified URL.
@@ -64,6 +66,22 @@ class ChatGPTAutomation:
         """
         self.lock = threading.Lock()
         user_data_dir = r'--user-data-dir=C:\path\to\custom\user\data\directory'
+        if chrome_path is None:
+            chrome_path = self.get_chrome_path()
+            if chrome_path is None:
+                raise FileNotFoundError("Unable to automatically find the Chrome path. "
+                                "Please provide the path to the Chrome executable.")
+
+        if chrome_driver_path is None:
+            try:
+                chrome_driver_path = ChromeDriverManager().install()
+            except ChromeDriverManagerException as e:
+                # Handle specific webdriver-manager exceptions
+                raise RuntimeError(f"Failed to install ChromeDriver: {e}")
+            except Exception as e:
+                # Handle any other unforeseen exceptions
+                raise RuntimeError(f"An unexpected error occurred while installing ChromeDriver: {e}")
+
         chrome_path = f'"{chrome_path}" {user_data_dir}'
         self.chrome_path = chrome_path
         self.chrome_driver_path = chrome_driver_path
@@ -71,13 +89,13 @@ class ChatGPTAutomation:
         self.url = r"https://chat.openai.com"
         free_port = self.find_available_port()
         self.launch_chrome_with_remote_debugging(free_port, self.url)
-        self.wait_for_human_verification()
+        # self.wait_for_human_verification()
         self.driver = self.setup_webdriver(free_port)
 
         self.username = username
         self.password = password
 
-        time.sleep(4)
+        time.sleep(7)
 
     def check_login_page(self) -> bool:
         """
@@ -205,7 +223,7 @@ class ChatGPTAutomation:
             # Specifying the address for the remote debugging
             chrome_options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
             # Initializing the Chrome WebDriver with the specified options
-            driver = webdriver.Chrome(executable_path=self.chrome_driver_path, options=chrome_options)
+            driver = webdriver.Chrome(self.chrome_driver_path, options=chrome_options)
             return driver
         except Exception as e:
             # Log the exception if WebDriver initialization fails
@@ -610,6 +628,42 @@ class ChatGPTAutomation:
         # Click on the submenu item
         submenu_element.click()
     
+    @staticmethod
+    def get_chrome_path() -> str:
+        try:
+            if platform.system() == 'Windows':
+                paths = [
+                    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+                    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+                    # Add any other common paths if necessary
+                ]
+                for path in paths:
+                    if os.path.isfile(path):
+                        return path
+
+            elif platform.system() == 'Darwin':  # macOS
+                path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+                if os.path.isfile(path):
+                    return path
+
+            elif platform.system() == 'Linux':
+                paths = [
+                    '/usr/bin/google-chrome',
+                    '/usr/local/bin/google-chrome'
+                ]
+                for path in paths:
+                    if os.path.isfile(path):
+                        return path
+
+        except PermissionError as e:
+            logging.error(f"Permission error when trying to find Chrome: {e}")
+        except OSError as e:
+            logging.error(f"OS error when trying to find Chrome: {e}")
+        except Exception as e:
+            logging.error(f"Unexpected error when trying to find Chrome: {e}")
+
+        return None
+
     def quit(self):
         """
         Closes the browser and terminates the WebDriver session.

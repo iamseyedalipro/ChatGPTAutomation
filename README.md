@@ -31,7 +31,22 @@ For downloading the Chrome WebDriver:
 
 Ensure that the version of Chrome WebDriver you download matches the version of your Google Chrome browser to avoid compatibility issues. 
 ---
-Import the package and use it in your Python scripts as follows:
+### Setup
+The `ChatGPTAutomation` package simplifies the setup process by automatically finding the Chrome executable path and downloading the Chrome WebDriver if needed. You can also manually specify these paths.
+
+For automatic setup, simply initialize `ChatGPTAutomation` without specifying `chrome_path` and `chrome_driver_path`:
+
+```python
+from chatgpt_automation.chatgpt_automation import ChatGPTAutomation
+
+# Initialize without specifying paths for automatic setup
+chat_bot = ChatGPTAutomation(
+    username="<your username here>", # Optional
+    password="<your password here>"  # Optional
+)
+```
+
+For manual setup, specify the paths to Chrome and ChromeDriver:
 
 ```python
 from chatgpt_automation.chatgpt_automation import ChatGPTAutomation
