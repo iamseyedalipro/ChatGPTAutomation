@@ -109,7 +109,6 @@ class ChatGPTAutomation:
         )
         pass_input.send_keys(password)
         pass_input.send_keys(Keys.ENTER)
-        
 
     def find_available_port(self):
         """
@@ -237,6 +236,10 @@ class ChatGPTAutomation:
             send_button.click()
             # Wait for the response to be generated (20 seconds)
             time.sleep(20)
+        except ElementNotInteractableException as e:
+            logging.error(f"Element not interactable: {e}")
+        except ElementNotVisibleException as e:
+            logging.error(f"Element not visible: {e}")
         except Exception as e:
             # Log the exception if any step in the process fails
             logging.error(f"Failed to send prompt to ChatGPT: {e}")
@@ -285,7 +288,6 @@ class ChatGPTAutomation:
             # Raising a WebDriverException to indicate failure in file upload
             raise WebDriverException(f"Error uploading file to ChatGPT: {e}")
 
-
     def return_chatgpt_conversation(self):
         """
         :return: returns a list of items, even items are the submitted questions (prompts) and odd items are chatgpt response
@@ -307,32 +309,30 @@ class ChatGPTAutomation:
         """
 
         try:
-            # Define the directory where conversations will be saved
             directory_name = "conversations"
-            # Create the directory if it does not exist
             if not os.path.exists(directory_name):
                 os.makedirs(directory_name)
 
-            # Define a delimiter for separating conversation parts in the file
             delimiter = "----------------------------------------"
-            # Retrieve the conversation elements from the ChatGPT interface
             chatgpt_conversation = self.return_chatgpt_conversation()
-
             del chatgpt_conversation[::2]
 
-            # Open the file and append the conversation
             with open(os.path.join(directory_name, file_name), "a") as file:
                 for i in range(0, len(chatgpt_conversation)):
-                    file.write(
-                        f"{chatgpt_conversation[i].text}\n\n{delimiter}\n\n")
+                    file.write(f"{chatgpt_conversation[i].text}\n\n{delimiter}\n\n")
+
+        except FileNotFoundError as e:
+            logging.error(f"File not found: {e}")
+            raise
+        except PermissionError as e:
+            logging.error(f"Permission denied: {e}")
+            raise
         except IOError as e:
-            # Log and raise an error if there is an issue writing to the file
-            logging.error(f"Failed to write conversation to file: {e}")
-            raise IOError(f"Error writing to file '{file_name}': {e}")
-        except IndexError as e:
-            # Log and raise an error if the conversation elements are not in the expected format
-            logging.error(f"Error in conversation format: {e}")
-            raise IndexError("Conversation elements are not in the expected format or not found.")
+            logging.error(f"IO error occurred: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Unexpected error in saving conversation: {e}")
+            raise
 
     def return_last_response(self):
         """
@@ -369,6 +369,7 @@ class ChatGPTAutomation:
             # Handle any other exceptions
             logging.error(f'Unexpected error in return_last_response: {str(e)}')
             return f"An unexpected error occurred: {str(e)}"
+    
     def wait_for_human_verification(self):
         """
         Pauses the automation process and waits for the user to manually complete tasks such as log-in
@@ -419,21 +420,23 @@ class ChatGPTAutomation:
         """
 
         try:
-            # Retrieve the last response from ChatGPT
             answer = self.return_last_response()
-
-            # Open the file for writing and use UTF-8 encoding
             with open(filename, "w", encoding="utf8") as file:
-                # Write the answer to the file
                 file.write(answer)
-
-            # Print a confirmation message
             print(f"Last answer saved in the file: {filename}")
 
+        except FileNotFoundError as e:
+            logging.error(f"File not found: {e}")
+            raise
+        except PermissionError as e:
+            logging.error(f"Permission denied: {e}")
+            raise
         except IOError as e:
-            # Log and raise an error if there is an issue writing to the file
-            logging.error(f"Failed to write the last answer to the file: {e}")
-            raise IOError(f"Error writing to file '{filename}': {e}")
+            logging.error(f"IO error occurred: {e}")
+            raise
+        except Exception as e:
+            logging.error(f"Unexpected error in writing last answer: {e}")
+            raise
 
     def open_new_chat(self):
         """
@@ -607,9 +610,6 @@ class ChatGPTAutomation:
         # Click on the submenu item
         submenu_element.click()
     
-
-    
-
     def quit(self):
         """
         Closes the browser and terminates the WebDriver session.
