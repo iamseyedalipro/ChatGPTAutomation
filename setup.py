@@ -6,11 +6,11 @@ with open('requirements.txt') as f:
 
 setup(
     name='ChatGPTAutomation',
-    version='0.2.1',
+    version='0.2.2',
     author='Seyed Ali Hosseini',
     author_email='iamseyedalipro@gmail.com',
     description='A Python package for automating interactions with ChatGPT using Selenium.',
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding="utf8").read(),
     long_description_content_type='text/markdown',
     url='https://github.com/iamseyedalipro/ChatGPTAutomation',
     packages=find_packages(),

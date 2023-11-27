@@ -15,7 +15,6 @@ import logging
 import platform
 import pyperclip
 from webdriver_manager.chrome import ChromeDriverManager
-
 # Configure logging
 logging.basicConfig(filename='chatgpt_automation.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
@@ -75,11 +74,7 @@ class ChatGPTAutomation:
         if chrome_driver_path is None:
             try:
                 chrome_driver_path = ChromeDriverManager().install()
-            except ChromeDriverManagerException as e:
-                # Handle specific webdriver-manager exceptions
-                raise RuntimeError(f"Failed to install ChromeDriver: {e}")
             except Exception as e:
-                # Handle any other unforeseen exceptions
                 raise RuntimeError(f"An unexpected error occurred while installing ChromeDriver: {e}")
 
         chrome_path = f'"{chrome_path}" {user_data_dir}'

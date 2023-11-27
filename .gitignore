@@ -6,3 +6,4 @@ ChatGPTAutomation.egg-info/
 build/
 dist/
 mytest/
+test.py
