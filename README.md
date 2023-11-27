@@ -86,6 +86,35 @@ if chat_bot.check_login_page():
 - Selenium==4.9.0
 - See `requirements.txt` for more.
 
+
+## To-Do List
+
+### Sign up:
+- ✅ User login
+- ⬜️ Sign up via email address
+
+### Conversation Management:
+- ✅ Create new conversation
+- ✅ Get message list in a conversation
+- ✅ Delete a conversation
+- ⬜️ Edit Conversation Name
+- ⬜️ Subscribe for realtime message
+- ⬜️ Handle Random message such as popup, hints, and login attempts
+
+### Advanced Features:
+- ✅ Support for uploading files
+- ⬜️ Support ChatGPT with internet
+- ⬜️ Using GPTs
+- ⬜️ API
+
+### User Account Handling:
+- ✅ Switch Between ChatGPT 3.5 and 4
+- ⬜️ Fetch user detail like email and plan type
+- ⬜️ Set custom instructions for more personalized conversations
+
+### Browser:
+- ⬜️ Headless Browser
+
 ## License
 MIT License - see [LICENCE.md](LICENCE.md).
 
