@@ -249,15 +249,24 @@ class ChatGPTAutomation:
             send_button.click()
             # Wait for the response to be generated (20 seconds)
             time.sleep(20)
-        except ElementNotInteractableException as e:
-            logging.error(f"Element not interactable: {e}")
-        except ElementNotVisibleException as e:
-            logging.error(f"Element not visible: {e}")
+        except NoSuchElementException:
+            if self.check_message_sent():
+                return
+            else:
+                logging.ERROR("Send message button does not found. if you see this error please create an issue in github!")
+                raise
         except Exception as e:
             # Log the exception if any step in the process fails
             logging.error(f"Failed to send prompt to ChatGPT: {e}")
             # Raising a WebDriverException to indicate failure in sending the prompt
             raise WebDriverException(f"Error sending prompt to ChatGPT: {e}")
+
+    def check_message_sent(self):
+        try:
+            self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
+            return False
+        except:
+            return True
 
     def upload_file_for_prompt(self, file_name):
         """
@@ -363,19 +372,9 @@ class ChatGPTAutomation:
         """
 
         try:
-            # Find the elements that contain the ChatGPT responses using a CSS selector.
-            response_elements = self.driver.find_elements(by=By.CSS_SELECTOR,
-                                                          value='[your CSS selector here]')
+            response = self.driver.find_elements(*ChatGPTLocators.CHAT_GPT_CONVERSION)[-1]
 
-            # Select the last element from the list of response elements.
-            response_element = response_elements[-1]
-
-            # Simulate a click action on the selected element.
-            response_element.click()
-
-            # Retrieve the copied text from the clipboard.
-            response_text = pyperclip.paste()
-            return response_text
+            return response.text
 
         except NoSuchElementException:
             # Handle the case where the element is not found
@@ -580,7 +579,7 @@ class ChatGPTAutomation:
 
             try:
                 # Check if the 'send' button is available, indicating the response is ready
-                self.driver.find_element(By.CSS_SELECTOR, 'button[data-testid="send-button"]')
+                self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
                 logging.info("Response Status: Ready to send.")
                 return True
             except NoSuchElementException:
