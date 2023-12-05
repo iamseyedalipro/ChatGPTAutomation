@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='ChatGPTAutomation',
-    version='0.2.2',
+    version='0.3.0',
     author='Seyed Ali Hosseini',
     author_email='iamseyedalipro@gmail.com',
     description='A Python package for automating interactions with ChatGPT using Selenium.',

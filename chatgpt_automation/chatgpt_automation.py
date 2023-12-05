@@ -49,7 +49,8 @@ class ChatGPTLocators:
     CHAT_GPT_SWITCH_TO_4 = (By.XPATH, '//div[contains(text(), "GPT-4")]')
     CHAT_GPT_SWITCH_TO_3 = (By.XPATH, '//div[contains(text(), "GPT-3.5")]')
     UPGRADE_TO_PLUS_BTN = (By.XPATH, '//div[contains(text(), "Upgrade to Plus")]')
-
+    
+    COPY_LAST_RESPONSE_BTN = (By.CSS_SELECTOR, '.final-completion > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > button:nth-child(1)')
     
 
 class ChatGPTAutomation:
@@ -385,6 +386,22 @@ class ChatGPTAutomation:
             logging.error(f'Unexpected error in return_last_response: {str(e)}')
             return f"An unexpected error occurred: {str(e)}"
     
+    def return_last_response_md(self):
+        try:
+            copy_btns = self.driver.find_elements(*ChatGPTLocators.COPY_LAST_RESPONSE_BTN)
+            if copy_btns:
+                copy_btns[0].click()
+                time.sleep(2)
+                return pyperclip.paste()
+            else:
+                logging.warning("No copy button found.")
+                return "No copy button found."
+
+        except Exception as e:
+            logging.error(f"Unexpected error in return_last_response_md: {str(e)}")
+            return f"An unexpected error occurred: {str(e)}"
+
+
     def wait_for_human_verification(self):
         """
         Pauses the automation process and waits for the user to manually complete tasks such as log-in
@@ -661,6 +678,27 @@ class ChatGPTAutomation:
 
         return None
 
+    # def check_verify_page(self):
+    #     try:
+    #         element = self.driver.find_element(By.XPATH, f'//*[contains(text(), "Verify you are human")]')
+    #         return True
+    #     except NoSuchElementException:
+    #         return False
+    #     except Exception as e:
+    #         logging.error(f"unexpected error: {e}")
+    #         raise Exception(e)
+
+    # def pass_verify(self):
+    #     try:
+    #         checkbox = driver.find_element(By.CSS_SELECTOR, 'input[type="checkbox"]')
+    #         if not checkbox.is_selected():
+    #             checkbox.click()
+            
+    #         time.sleep(15)
+    #     except NoSuchElementException:
+    #         logging.error("Check Box for human verify doesn't find!")
+    #         raise Exception("Check Box for human verify doesn't find!")
+        
     def quit(self):
         """
         Closes the browser and terminates the WebDriver session.
