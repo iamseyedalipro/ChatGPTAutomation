@@ -54,6 +54,10 @@ chat_bot.send_prompt_to_chatgpt("Hello, ChatGPT!")
 chat_bot.save_conversation("conversation.txt")
 ```
 
+```python
+chat_bot.login_using_gamil("iamseyedalipro@gmail.com") #this is optional you can set the email first of setup on username field
+```
+
 ### File upload
 ```python
 chat_bot.upload_file_for_prompt("test_file.txt")
