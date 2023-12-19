@@ -54,6 +54,17 @@ class ChatGPTLocators:
     
 
 class ChatGPTAutomation:
+    class DelayTimes:
+        CONSTRUCTOR_DELAY = 6
+        SEND_PROMPT_DELAY = 20
+        UPLOAD_FILE_DELAY = 10
+        RETURN_LAST_RESPONSE_DELAY = 2
+        OPEN_NEW_CHAT_DELAY = 10
+        DEL_CURRENT_CHAT_OPEN_MENU_DELAY = 3
+        DEL_CURRENT_CHAT_AFTER_DELETE_DELAY = 5
+        DEL_CURRENT_CHAT_BEFORE_OPEN_NEW_CHAT_DELAY = 5
+        CHECK_RESPONSE_STATUS_DELAY = 7
+
     def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None):
         """
         This constructor automates the following steps:
@@ -91,7 +102,7 @@ class ChatGPTAutomation:
         self.username = username
         self.password = password
 
-        time.sleep(6)
+        time.sleep(self.DelayTimes.CONSTRUCTOR_DELAY)
 
     def check_login_page(self) -> bool:
         """
@@ -249,7 +260,7 @@ class ChatGPTAutomation:
             send_button = self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
             send_button.click()
             # Wait for the response to be generated (20 seconds)
-            time.sleep(20)
+            time.sleep(self.DelayTimes.SEND_PROMPT_DELAY)
         except NoSuchElementException:
             if self.check_message_sent():
                 return
@@ -299,7 +310,7 @@ class ChatGPTAutomation:
             # Send the file path to the file input element, initiating the upload
             file_input.send_keys(file_path)
             # Wait for the upload process to complete (10 seconds)
-            time.sleep(10)
+            time.sleep(self.DelayTimes.UPLOAD_FILE_DELAY)
         except FileNotFoundError as e:
             # Log the exception if the file is not found
             logging.error(f"File not found for upload: {e}")
@@ -391,7 +402,7 @@ class ChatGPTAutomation:
             copy_btns = self.driver.find_elements(*ChatGPTLocators.COPY_LAST_RESPONSE_BTN)
             if copy_btns:
                 copy_btns[0].click()
-                time.sleep(2)
+                time.sleep(self.DelayTimes.RETURN_LAST_RESPONSE_DELAY)
                 return pyperclip.paste()
             else:
                 logging.warning("No copy button found.")
@@ -484,7 +495,7 @@ class ChatGPTAutomation:
             # Print confirmation message
             print("New chat opened")
             # Wait for the page to load completely (10 seconds)
-            time.sleep(10)
+            time.sleep(self.DelayTimes.OPEN_NEW_CHAT_DELAY)
         except Exception as e:
             # Log the exception if navigation fails
             logging.error(f"Failed to open new chat: {e}")
@@ -509,7 +520,7 @@ class ChatGPTAutomation:
                 EC.element_to_be_clickable((ChatGPTLocators.FIRST_DELETE_BTN[0], ChatGPTLocators.FIRST_DELETE_BTN[1]))
             )
             del_chat_btn1.click()
-            time.sleep(3)  # Wait for UI response
+            time.sleep(self.DelayTimes.DEL_CURRENT_CHAT_OPEN_MENU_DELAY)  # Wait for UI response
 
             # Wait and click the second delete button
             del_chat_btn = WebDriverWait(self.driver, 10).until(
@@ -524,7 +535,7 @@ class ChatGPTAutomation:
             del_chat_btn.click()
 
             print("Current chat deleted")
-            time.sleep(5)  # Wait for the chat to be completely deleted
+            time.sleep(self.DelayTimes.DEL_CURRENT_CHAT_AFTER_DELETE_DELAY)  # Wait for the chat to be completely deleted
 
         except TimeoutException:
             # Handle timeout exception when elements are not found within the specified time
@@ -539,7 +550,7 @@ class ChatGPTAutomation:
             # Handle any other exceptions that might occur
             logging.error(f"Error encountered while deleting chat: {e}")
             try:
-                time.sleep(5)
+                time.sleep(self.DelayTimes.DEL_CURRENT_CHAT_BEFORE_OPEN_NEW_CHAT_DELAY)
                 self.open_new_chat()
             except Exception as e:
                 logging.error(f"Failed to open new chat after error: {e}")
@@ -605,7 +616,7 @@ class ChatGPTAutomation:
 
             # Log and wait before checking again
             logging.info("Responding...")
-            time.sleep(7)
+            time.sleep(self.DelayTimes.CHECK_RESPONSE_STATUS_DELAY)
 
     def switch_model(self, model_name: float):
         """
