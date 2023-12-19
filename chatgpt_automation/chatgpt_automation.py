@@ -51,7 +51,10 @@ class ChatGPTLocators:
     UPGRADE_TO_PLUS_BTN = (By.XPATH, '//div[contains(text(), "Upgrade to Plus")]')
     
     COPY_LAST_RESPONSE_BTN = (By.CSS_SELECTOR, '.final-completion > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > button:nth-child(1)')
-    
+
+    LOGIN_WITH_GMAIL_BTN = (By.CSS_SELECTOR, 'form[data-provider="google"] button[data-provider="google"]')
+    GMAIL_BTN = (By.XPATH, '//div[@data-email="{}"]')
+
 
 class ChatGPTAutomation:
     class DelayTimes:
@@ -64,6 +67,9 @@ class ChatGPTAutomation:
         DEL_CURRENT_CHAT_AFTER_DELETE_DELAY = 5
         DEL_CURRENT_CHAT_BEFORE_OPEN_NEW_CHAT_DELAY = 5
         CHECK_RESPONSE_STATUS_DELAY = 7
+        LOGIN_USING_GMAIL_CLICK_DELAY = 6
+        GMAIL_SELECT_DELAY = 25
+        AFTER_LOGIN_CLICK_DELAY = 5
 
     def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None):
         """
@@ -111,6 +117,31 @@ class ChatGPTAutomation:
         :return: True if the login button is found, indicating the presence of the login page; False otherwise.
         """
         return bool(self.driver.find_elements(*ChatGPTLocators.LOGIN_BTN))
+
+    def login_using_gamil(self, email: str = None ):
+        if email is None:
+            if self.username is None:
+                raise Exception("You must pass the email in username field when you create the class")
+            else:
+                email = self.username
+
+        login_btn = self.driver.find_element(*ChatGPTLocators.LOGIN_BTN)
+        login_btn.click()
+
+        time.sleep(self.DelayTimes.AFTER_LOGIN_CLICK_DELAY)
+
+        gmail_login_btn = self.driver.find_element(*ChatGPTLocators.LOGIN_WITH_GMAIL_BTN)
+        gmail_login_btn.click()
+
+        time.sleep(self.DelayTimes.LOGIN_USING_GMAIL_CLICK_DELAY)
+
+        gmail_btn = self.driver.find_element(ChatGPTLocators.GMAIL_BTN[0], ChatGPTLocators.GMAIL_BTN[1].format(email))
+        gmail_btn.click()
+
+        time.sleep(self.DelayTimes.GMAIL_SELECT_DELAY)
+
+
+
 
     def login(self, username: str = None, password: str = None):
         if username is None:
