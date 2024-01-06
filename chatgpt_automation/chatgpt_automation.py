@@ -55,6 +55,11 @@ class ChatGPTLocators:
     LOGIN_WITH_GMAIL_BTN = (By.CSS_SELECTOR, 'form[data-provider="google"] button[data-provider="google"]')
     GMAIL_BTN = (By.XPATH, '//div[@data-email="{}"]')
 
+    GMAIL_INPUT = (By.CSS_SELECTOR, 'input[type="email"][id="identifierId"]')
+    GMAIL_NEXT_BTN = (By.ID, 'identifierNext')
+    GMAIL_PASSWORD_INPUT = (By.CSS_SELECTOR, 'input[type="password"][name="password"]')
+    GMAIL_PASSWORD_NEXT_BTN = (By.ID, 'passwordNext')
+    ADD_NEW_GMAIL_BTN = (By.XPATH, '//li[contains(.,"Use another account")]')
 
 class ChatGPTAutomation:
     class DelayTimes:
@@ -70,6 +75,10 @@ class ChatGPTAutomation:
         LOGIN_USING_GMAIL_CLICK_DELAY = 6
         GMAIL_SELECT_DELAY = 25
         AFTER_LOGIN_CLICK_DELAY = 5
+        ADD_GMAIL_CLICK_DELAY = 3
+        GMAIL_NEXT_CLICK_DELAY = 5
+        GMAIL_PASSWORD_NEXT_CLICK_DELAY = 11
+
 
     def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None):
         """
@@ -760,3 +769,92 @@ class ChatGPTAutomation:
         except Exception as e:
             # Log any exceptions that occur during the quit process
             logging.error(f"An error occurred while closing the browser: {e}")
+
+
+    def gmail_login_setup(self, email: str = None, password: str=None):
+        """
+        Automates the Gmail login process within the ChatGPT web interface using Selenium WebDriver. This method handles the
+        authentication process by entering provided Gmail credentials or using those stored in the class instance.
+
+        The function follows a specific sequence of steps to navigate through the ChatGPT login interface and to input the 
+        Gmail credentials. If two-factor authentication (2FA) or human verification is required, the function prompts the 
+        user to complete these steps manually.
+
+        Args:
+            email (str, optional): The email address for the Gmail account. If not provided, the class instance's email is used.
+            password (str, optional): The password for the Gmail account. If not provided, the class instance's password is used.
+
+        Workflow:
+        1. Validates the presence of email and password.
+        2. Navigates through the ChatGPT login interface, clicking relevant buttons to reach the Gmail login section.
+        3. Enters the email and password into the Gmail login form.
+        4. Handles additional steps such as 2FA or human verification if they are triggered during login.
+
+        Raises:
+            Exception: If neither email nor password is provided either through function arguments or stored in the class instance.
+
+        Note:
+        - This function assumes that the WebDriver (`self.driver`) and specific locators (`ChatGPTLocators`) are already initialized.
+        - The user may need to manually complete 2FA or human verification steps if they are prompted by Gmail.
+        """
+        if (email is None or password is None) and (self.username is None or self.password is None):
+            raise Exception("you must pass email and password in function params or when you create the class...")
+        elif (email is None or password is None) and (self.username is not None or self.password is not None):
+            email = self.username
+            password = self.password
+        
+        login_btn = self.driver.find_element(*ChatGPTLocators.LOGIN_BTN)
+        login_btn.click()
+
+        time.sleep(self.DelayTimes.AFTER_LOGIN_CLICK_DELAY)
+
+        gmail_login_btn = self.driver.find_element(*ChatGPTLocators.LOGIN_WITH_GMAIL_BTN)
+        gmail_login_btn.click()
+
+        time.sleep(self.DelayTimes.LOGIN_USING_GMAIL_CLICK_DELAY)
+
+        add_gmail_btn = self.driver.find_element(*ChatGPTLocators.ADD_NEW_GMAIL_BTN)
+        add_gmail_btn.click()
+
+        time.sleep(self.DelayTimes.ADD_GMAIL_CLICK_DELAY)
+
+        gmail_input = self.driver.find_element(*ChatGPTLocators.GMAIL_INPUT)
+        gmail_input.send_keys(email)
+
+        next_btn = self.driver.find_element(*ChatGPTLocators.GMAIL_NEXT_BTN)
+        next_btn.click()
+
+        time.sleep(self.DelayTimes.GMAIL_NEXT_CLICK_DELAY)
+
+        password_input = self.driver.find_element(*ChatGPTLocators.GMAIL_PASSWORD_INPUT)
+        password_input.send_keys(password)
+
+        next_btn = self.driver.find_element(*ChatGPTLocators.GMAIL_PASSWORD_NEXT_BTN)
+        next_btn.click()
+
+        time.sleep(self.DelayTimes.GMAIL_PASSWORD_NEXT_CLICK_DELAY)
+
+        try:
+            self.driver.find_element(*ChatGPTLocators.MSG_BOX_INPUT)
+            print("Login completed!")
+        except:
+            print("you need manually complete the 2FA or human verification...")
+            with self.lock:
+                while True:
+                    try:
+                        user_input = input(
+                            "Enter 'y' if you have completed the log-in or the human verification, or 'n' to check again: ").lower()
+                    except EOFError:
+                        # Print error message and exit the program in case of an End-Of-File condition on input
+                        print("Error reading input. Exiting the program.")
+                        raise SystemExit("Failed to read user input.")  # Exiting the program due to input error
+
+                    # Check the user's input and act accordingly
+                    if user_input == 'y':
+                        print("Authentication Completed!\nContinuing with the automation process...")
+                        break  # Break the loop to continue with automation
+                    elif user_input == 'n':
+                        print("Waiting for you to complete the human verification...")
+                        time.sleep(5)  # Waiting for a specified time before asking again
+                    else:
+                        print("Invalid input. Please enter 'y' or 'n'.")  # Handle invalid input

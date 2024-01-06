@@ -54,10 +54,6 @@ chat_bot.send_prompt_to_chatgpt("Hello, ChatGPT!")
 chat_bot.save_conversation("conversation.txt")
 ```
 
-```python
-chat_bot.login_using_gamil("iamseyedalipro@gmail.com") #this is optional you can set the email first of setup on username field
-```
-
 ### File upload
 ```python
 chat_bot.upload_file_for_prompt("test_file.txt")
@@ -88,6 +84,29 @@ chat_bot.switch_model(4)
 if chat_bot.check_login_page():
     chat_bot.login()
 ```
+
+### Login with Gmail
+
+The `gmail_login_setup` function in `ChatGPTAutomation` allows you to automate the process of logging into ChatGPT using a Gmail account.
+
+#### Automatic Gmail Login
+To automatically log in using Gmail credentials, you can use the `gmail_login_setup` method. This method requires the email and password to be set either as parameters or within the class instance.
+
+```python
+# Automatic login using stored credentials
+chat_bot.gmail_login_setup()
+
+# Alternatively, specify the credentials directly
+chat_bot.gmail_login_setup(email="your.email@gmail.com", password="yourpassword")
+```
+
+#### Login with google
+if you logged in to the google account but logged out from openai account can use this function for login with that gmail
+```python
+chat_bot.login_using_gamil("iamseyedalipro@gmail.com") #this is optional you can set the email first of setup on username field
+```
+
+
 
 ---
 ## Delay Configurations
