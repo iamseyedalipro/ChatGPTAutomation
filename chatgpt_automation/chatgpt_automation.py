@@ -14,7 +14,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import logging
 import platform
 import pyperclip
-from webdriver_manager.chrome import ChromeDriverManager
+from chatgpt_automation.chromedriver_manager import ChromeDriverManager
 # Configure logging
 logging.basicConfig(filename='chatgpt_automation.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
