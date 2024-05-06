@@ -106,7 +106,7 @@ class ChatGPTAutomation:
             except Exception as e:
                 raise RuntimeError(f"An unexpected error occurred while installing ChromeDriver: {e}")
 
-        chrome_path = f'"{chrome_path}" {user_data_dir}'
+        # chrome_path = f'"{chrome_path}" {user_data_dir}'
         self.chrome_path = chrome_path
         self.chrome_driver_path = chrome_driver_path
 
@@ -270,6 +270,7 @@ class ChatGPTAutomation:
             # Setting up Chrome options for WebDriver
             chrome_options = webdriver.ChromeOptions()
             # Specifying the address for the remote debugging
+            chrome_options.binary_location = self.chrome_driver_path
             chrome_options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
             # Initializing the Chrome WebDriver with the specified options
             driver = webdriver.Chrome(self.chrome_driver_path, options=chrome_options)
@@ -699,14 +700,12 @@ class ChatGPTAutomation:
     def get_chrome_path() -> str:
         try:
             if platform.system() == 'Windows':
-                paths = [
+                for path in [
                     r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
                     r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-                    # Add any other common paths if necessary
-                ]
-                for path in paths:
+                ]:
                     if os.path.isfile(path):
-                        return path
+                        return r'"{}"'.format(path)
 
             elif platform.system() == 'Darwin':  # macOS
                 path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
