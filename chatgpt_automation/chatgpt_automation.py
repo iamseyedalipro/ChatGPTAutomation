@@ -61,6 +61,8 @@ class ChatGPTLocators:
     GMAIL_PASSWORD_NEXT_BTN = (By.ID, 'passwordNext')
     ADD_NEW_GMAIL_BTN = (By.XPATH, '//li[contains(.,"Use another account")]')
 
+    RESPONSE_DIV = (By.CLASS_NAME, "markdown")
+
 class ChatGPTAutomation:
     class DelayTimes:
         CONSTRUCTOR_DELAY = 6
@@ -424,7 +426,7 @@ class ChatGPTAutomation:
         """
 
         try:
-            response = self.driver.find_elements(*ChatGPTLocators.CHAT_GPT_CONVERSION)[-1]
+            response = self.driver.find_elements(*ChatGPTLocators.RESPONSE_DIV)[-1]
 
             return response.text
 
