@@ -8,3 +8,4 @@ dist/
 mytest/
 test.py
 .idea/
+chromedriver/
