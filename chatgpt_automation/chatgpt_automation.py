@@ -82,7 +82,7 @@ class ChatGPTAutomation:
         GMAIL_PASSWORD_NEXT_CLICK_DELAY = 11
 
 
-    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None):
+    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None, user_data_dir: str = "remote-profile"):
         """
         This constructor automates the following steps:
         1. Open a Chrome browser with remote debugging enabled at a specified URL.
@@ -93,7 +93,7 @@ class ChatGPTAutomation:
         :param chrome_driver_path: file path to chrome.exe (ex. C:\\Users\\User\\...\\chromedriver.exe)
         """
         self.lock = threading.Lock()
-        user_data_dir = r'--user-data-dir=C:\path\to\custom\user\data\directory'
+        self.user_data_dir = user_data_dir
         if chrome_path is None:
             chrome_path = self.get_chrome_path()
             if chrome_path is None:
@@ -120,6 +120,8 @@ class ChatGPTAutomation:
         self.password = password
 
         time.sleep(self.DelayTimes.CONSTRUCTOR_DELAY)
+        
+        self.chrome_data_dir_path = None
 
     def check_login_page(self) -> bool:
         """
@@ -232,7 +234,7 @@ class ChatGPTAutomation:
         def open_chrome():
             try:
                 # Construct the command to launch Chrome with specified debugging port and URL
-                chrome_cmd = f"{self.chrome_path} --remote-debugging-port={port} --user-data-dir=remote-profile {url}"
+                chrome_cmd = f"{self.chrome_path} --remote-debugging-port={port} --user-data-dir={self.user_data_dir} {url}"
                 # Execute the command in the system shell
                 os.system(chrome_cmd)
             except Exception as e:
