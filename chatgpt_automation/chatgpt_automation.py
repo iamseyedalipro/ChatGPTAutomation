@@ -24,7 +24,7 @@ class ChatGPTLocators:
     MSG_BOX_INPUT = (By.CSS_SELECTOR, 'textarea#prompt-textarea')
     MSG_BOX_INPUT2 = (By.TAG_NAME, 'textarea')
 
-    SEND_MSG_BTN = (By.CSS_SELECTOR, 'button[data-testid="send-button"]')
+    SEND_MSG_BTN = (By.XPATH, "//*[contains(@data-testid, 'send-button')]")
 
     GPT4_FILE_INPUT = (By.CSS_SELECTOR, 'input.hidden')
 
@@ -32,10 +32,10 @@ class ChatGPTLocators:
     REGENERATE_BTN = (By.CSS_SELECTOR, 'button[as="button"]')
 
     FIRST_DELETE_BTN = (By.CSS_SELECTOR, 'button[data-state="closed"]')
-    SECOND_DELETE_BTN = (By.CSS_SELECTOR, 'div[role="menuitem"].text-red-500')
+    SECOND_DELETE_BTN = (By.CSS_SELECTOR, 'div[role="menuitem"].text-token-text-error')
     THIRD_DELETE_BTN = (By.CSS_SELECTOR, 'button.btn.btn-danger[as="button"]')
 
-    RECYCLE_BTN = (By.CSS_SELECTOR, 'button.p-1.hover\:text-token-text-primary:nth-child(2)')
+    RECYCLE_BTN = (By.CSS_SELECTOR, 'button.p-1.hover\\:text-token-text-primary:nth-child(2)')
     DELETE_CONFIRM_BTN = (By.CSS_SELECTOR, 'button.btn.relative.btn-danger')
 
     NEW_CHAT_BTN = (By.CSS_SELECTOR, 'button.text-token-text-primary')
@@ -46,11 +46,12 @@ class ChatGPTLocators:
     PASSWORD_INPUT = (By.ID, "password")
 
     CHATGPT_SWITCH_HOVER_BTN = (By.CSS_SELECTOR, 'div[aria-haspopup="menu"]')
-    CHAT_GPT_SWITCH_TO_4 = (By.XPATH, '//div[contains(text(), "GPT-4")]')
+    CHAT_GPT_SWITCH_TO_4 = (By.XPATH, '//div[text()="GPT-4"]')
     CHAT_GPT_SWITCH_TO_3 = (By.XPATH, '//div[contains(text(), "GPT-3.5")]')
+    CHAT_GPT_SWITCH_TO_4O = (By.XPATH, '//div[text()="GPT-4o"]')
     UPGRADE_TO_PLUS_BTN = (By.XPATH, '//div[contains(text(), "Upgrade to Plus")]')
     
-    COPY_LAST_RESPONSE_BTN = (By.CSS_SELECTOR, '.final-completion > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > button:nth-child(1)')
+    COPY_LAST_RESPONSE_BTN = (By.CSS_SELECTOR, '.rounded-lg.text-token-text-secondary.hover\\:bg-token-main-surface-secondary')
 
     LOGIN_WITH_GMAIL_BTN = (By.CSS_SELECTOR, 'form[data-provider="google"] button[data-provider="google"]')
     GMAIL_BTN = (By.XPATH, '//div[@data-email="{}"]')
@@ -82,7 +83,7 @@ class ChatGPTAutomation:
         GMAIL_PASSWORD_NEXT_CLICK_DELAY = 11
 
 
-    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None):
+    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None, user_data_dir= "remote-profile"):
         """
         This constructor automates the following steps:
         1. Open a Chrome browser with remote debugging enabled at a specified URL.
@@ -92,6 +93,7 @@ class ChatGPTAutomation:
         :param chrome_path: file path to chrome.exe (ex. C:\\Users\\User\\...\\chromedriver.exe)
         :param chrome_driver_path: file path to chrome.exe (ex. C:\\Users\\User\\...\\chromedriver.exe)
         """
+        self.user_data_dir = user_data_dir
         self.lock = threading.Lock()
         user_data_dir = r'--user-data-dir=C:\path\to\custom\user\data\directory'
         if chrome_path is None:
@@ -232,7 +234,7 @@ class ChatGPTAutomation:
         def open_chrome():
             try:
                 # Construct the command to launch Chrome with specified debugging port and URL
-                chrome_cmd = f"{self.chrome_path} --remote-debugging-port={port} --user-data-dir=remote-profile {url}"
+                chrome_cmd = f"{self.chrome_path} --remote-debugging-port={port} --user-data-dir={self.user_data_dir} {url}"
                 # Execute the command in the system shell
                 os.system(chrome_cmd)
             except Exception as e:
@@ -399,7 +401,7 @@ class ChatGPTAutomation:
 
             with open(os.path.join(directory_name, file_name), "a") as file:
                 for i in range(0, len(chatgpt_conversation)):
-                    file.write(f"{chatgpt_conversation[i].text}\n\n{delimiter}\n\n")
+                    file.write(f"{chatgpt_conversation[i]}\n\n{delimiter}\n\n")
 
         except FileNotFoundError as e:
             logging.error(f"File not found: {e}")
@@ -444,7 +446,7 @@ class ChatGPTAutomation:
         try:
             copy_btns = self.driver.find_elements(*ChatGPTLocators.COPY_LAST_RESPONSE_BTN)
             if copy_btns:
-                copy_btns[0].click()
+                copy_btns[-3].click()
                 time.sleep(self.DelayTimes.RETURN_LAST_RESPONSE_DELAY)
                 return pyperclip.paste()
             else:
@@ -661,7 +663,7 @@ class ChatGPTAutomation:
             logging.info("Responding...")
             time.sleep(self.DelayTimes.CHECK_RESPONSE_STATUS_DELAY)
 
-    def switch_model(self, model_name: float):
+    def switch_model(self, model_name: str):
         """
         Switches between different ChatGPT models in the application's user interface.
 
@@ -676,7 +678,7 @@ class ChatGPTAutomation:
         menu_element.click()
 
         # Wait for the submenu to be visible (adjust timeout as needed)
-        if model_name == 4:
+        if model_name == "4":
             submenu_locator = ChatGPTLocators.CHAT_GPT_SWITCH_TO_4
             try:
                 # Check for the UPGRADE_TO_PLUS_BTN
@@ -684,12 +686,18 @@ class ChatGPTAutomation:
                 raise Exception("You must upgrade your ChatGPT account to plus")
             except NoSuchElementException:
                 pass
-        elif model_name == 3:
+        elif model_name == "3.5":
             submenu_locator = ChatGPTLocators.CHAT_GPT_SWITCH_TO_3
+        elif model_name == "4o":
+            submenu_locator = ChatGPTLocators.CHAT_GPT_SWITCH_TO_4O
+            try:
+                # Check for the UPGRADE_TO_PLUS_BTN
+                self.driver.find_element(*ChatGPTLocators.UPGRADE_TO_PLUS_BTN)
+                raise Exception("You must upgrade your ChatGPT account to plus")
+            except NoSuchElementException:
+                pass
         else:
             raise Exception("To switch between models, you need to set the 'model_name' to 3.5 or 4")
-
-
         
         submenu_element = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(submenu_locator))
 
