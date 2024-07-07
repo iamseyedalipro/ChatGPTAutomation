@@ -112,7 +112,7 @@ class ChatGPTAutomation:
         self.chrome_path = chrome_path
         self.chrome_driver_path = chrome_driver_path
 
-        self.url = r"https://chat.openai.com"
+        self.url = r"chatgpt.com"
         free_port = self.find_available_port()
         self.launch_chrome_with_remote_debugging(free_port, self.url)
         # self.wait_for_human_verification()
@@ -298,12 +298,14 @@ class ChatGPTAutomation:
         try:
             # Locate the input box element on the webpage
             input_box = self.driver.find_element(*ChatGPTLocators.MSG_BOX_INPUT)
-            self.driver.execute_script("arguments[0].value = arguments[1];", input_box, prompt)
+            input_box.click()
+            self.type_in_selected_area(prompt, input_box)
             # Simulate the key press action to send the prompt
-            input_box.send_keys(Keys.RETURN)
+            input_box.send_keys(Keys.ENTER)
             # Locate and click the send button to submit the prompt
-            send_button = self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
-            send_button.click()
+            # old code for send message now press enter for send msg
+            # send_button = self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
+            # send_button.click()
             # Wait for the response to be generated (20 seconds)
             time.sleep(self.DelayTimes.SEND_PROMPT_DELAY)
         except NoSuchElementException:
@@ -867,3 +869,10 @@ class ChatGPTAutomation:
                         time.sleep(5)  # Waiting for a specified time before asking again
                     else:
                         print("Invalid input. Please enter 'y' or 'n'.")  # Handle invalid input
+
+    def type_in_selected_area(self, text:str ,element):
+        for char in text:
+            if char == "\n":
+                element.send_keys(Keys.SHIFT + Keys.ENTER)
+            else:
+                element.send_keys(char)
