@@ -1,6 +1,6 @@
 import os
 from chatgpt_automation.chatgpt_automation import ChatGPTAutomation  # Import the ChatGPTAutomation class
-
+import time
 class ChromeManager:
     def __init__(self, number_of_instances):
         self.chromes = {}
