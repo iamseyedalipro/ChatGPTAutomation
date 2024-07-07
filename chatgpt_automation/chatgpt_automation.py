@@ -24,7 +24,7 @@ class ChatGPTLocators:
     MSG_BOX_INPUT = (By.CSS_SELECTOR, 'textarea#prompt-textarea')
     MSG_BOX_INPUT2 = (By.TAG_NAME, 'textarea')
 
-    SEND_MSG_BTN = (By.CSS_SELECTOR, 'button[data-testid="send-button"]')
+    SEND_MSG_BTN = (By.XPATH, "//*[contains(@data-testid, 'send-button')]")
 
     GPT4_FILE_INPUT = (By.CSS_SELECTOR, 'input.hidden')
 
@@ -32,10 +32,10 @@ class ChatGPTLocators:
     REGENERATE_BTN = (By.CSS_SELECTOR, 'button[as="button"]')
 
     FIRST_DELETE_BTN = (By.CSS_SELECTOR, 'button[data-state="closed"]')
-    SECOND_DELETE_BTN = (By.CSS_SELECTOR, 'div[role="menuitem"].text-red-500')
+    SECOND_DELETE_BTN = (By.CSS_SELECTOR, 'div[role="menuitem"].text-token-text-error')
     THIRD_DELETE_BTN = (By.CSS_SELECTOR, 'button.btn.btn-danger[as="button"]')
 
-    RECYCLE_BTN = (By.CSS_SELECTOR, 'button.p-1.hover\:text-token-text-primary:nth-child(2)')
+    RECYCLE_BTN = (By.CSS_SELECTOR, 'button.p-1.hover\\:text-token-text-primary:nth-child(2)')
     DELETE_CONFIRM_BTN = (By.CSS_SELECTOR, 'button.btn.relative.btn-danger')
 
     NEW_CHAT_BTN = (By.CSS_SELECTOR, 'button.text-token-text-primary')
@@ -46,11 +46,12 @@ class ChatGPTLocators:
     PASSWORD_INPUT = (By.ID, "password")
 
     CHATGPT_SWITCH_HOVER_BTN = (By.CSS_SELECTOR, 'div[aria-haspopup="menu"]')
-    CHAT_GPT_SWITCH_TO_4 = (By.XPATH, '//div[contains(text(), "GPT-4")]')
+    CHAT_GPT_SWITCH_TO_4 = (By.XPATH, '//div[text()="GPT-4"]')
     CHAT_GPT_SWITCH_TO_3 = (By.XPATH, '//div[contains(text(), "GPT-3.5")]')
+    CHAT_GPT_SWITCH_TO_4O = (By.XPATH, '//div[text()="GPT-4o"]')
     UPGRADE_TO_PLUS_BTN = (By.XPATH, '//div[contains(text(), "Upgrade to Plus")]')
     
-    COPY_LAST_RESPONSE_BTN = (By.CSS_SELECTOR, '.final-completion > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > button:nth-child(1)')
+    COPY_LAST_RESPONSE_BTN = (By.CSS_SELECTOR, '.rounded-lg.text-token-text-secondary.hover\\:bg-token-main-surface-secondary')
 
     LOGIN_WITH_GMAIL_BTN = (By.CSS_SELECTOR, 'form[data-provider="google"] button[data-provider="google"]')
     GMAIL_BTN = (By.XPATH, '//div[@data-email="{}"]')
@@ -82,7 +83,7 @@ class ChatGPTAutomation:
         GMAIL_PASSWORD_NEXT_CLICK_DELAY = 11
 
 
-    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None, user_data_dir: str = "remote-profile"):
+    def __init__(self, chrome_path=None, chrome_driver_path=None, username: str = None, password: str=None, user_data_dir= "remote-profile"):
         """
         This constructor automates the following steps:
         1. Open a Chrome browser with remote debugging enabled at a specified URL.
@@ -92,8 +93,9 @@ class ChatGPTAutomation:
         :param chrome_path: file path to chrome.exe (ex. C:\\Users\\User\\...\\chromedriver.exe)
         :param chrome_driver_path: file path to chrome.exe (ex. C:\\Users\\User\\...\\chromedriver.exe)
         """
-        self.lock = threading.Lock()
         self.user_data_dir = user_data_dir
+        self.lock = threading.Lock()
+        user_data_dir = r'--user-data-dir=C:\path\to\custom\user\data\directory'
         if chrome_path is None:
             chrome_path = self.get_chrome_path()
             if chrome_path is None:
@@ -110,7 +112,7 @@ class ChatGPTAutomation:
         self.chrome_path = chrome_path
         self.chrome_driver_path = chrome_driver_path
 
-        self.url = r"https://chat.openai.com"
+        self.url = r"chatgpt.com"
         free_port = self.find_available_port()
         self.launch_chrome_with_remote_debugging(free_port, self.url)
         # self.wait_for_human_verification()
@@ -120,8 +122,6 @@ class ChatGPTAutomation:
         self.password = password
 
         time.sleep(self.DelayTimes.CONSTRUCTOR_DELAY)
-        
-        self.chrome_data_dir_path = None
 
     def check_login_page(self) -> bool:
         """
@@ -298,12 +298,14 @@ class ChatGPTAutomation:
         try:
             # Locate the input box element on the webpage
             input_box = self.driver.find_element(*ChatGPTLocators.MSG_BOX_INPUT)
-            self.driver.execute_script("arguments[0].value = arguments[1];", input_box, prompt)
+            input_box.click()
+            self.type_in_selected_area(prompt, input_box)
             # Simulate the key press action to send the prompt
-            input_box.send_keys(Keys.RETURN)
+            input_box.send_keys(Keys.ENTER)
             # Locate and click the send button to submit the prompt
-            send_button = self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
-            send_button.click()
+            # old code for send message now press enter for send msg
+            # send_button = self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
+            # send_button.click()
             # Wait for the response to be generated (20 seconds)
             time.sleep(self.DelayTimes.SEND_PROMPT_DELAY)
         except NoSuchElementException:
@@ -401,7 +403,7 @@ class ChatGPTAutomation:
 
             with open(os.path.join(directory_name, file_name), "a") as file:
                 for i in range(0, len(chatgpt_conversation)):
-                    file.write(f"{chatgpt_conversation[i].text}\n\n{delimiter}\n\n")
+                    file.write(f"{chatgpt_conversation[i]}\n\n{delimiter}\n\n")
 
         except FileNotFoundError as e:
             logging.error(f"File not found: {e}")
@@ -446,7 +448,7 @@ class ChatGPTAutomation:
         try:
             copy_btns = self.driver.find_elements(*ChatGPTLocators.COPY_LAST_RESPONSE_BTN)
             if copy_btns:
-                copy_btns[0].click()
+                copy_btns[-3].click()
                 time.sleep(self.DelayTimes.RETURN_LAST_RESPONSE_DELAY)
                 return pyperclip.paste()
             else:
@@ -458,39 +460,6 @@ class ChatGPTAutomation:
             return f"An unexpected error occurred: {str(e)}"
 
 
-    def wait_for_human_verification(self):
-        """
-        Pauses the automation process and waits for the user to manually complete tasks such as log-in
-        or human verification, which are not automatable. The function repeatedly prompts the user until
-        they confirm the completion of the manual task.
-
-        Returns:
-            None
-
-        Raises:
-            SystemExit: If an unrecoverable input error occurs, indicating a problem with the system or environment.
-        """
-        with self.lock:
-            print("You need to manually complete the log-in or the human verification if required.")
-
-            while True:
-                try:
-                    user_input = input(
-                        "Enter 'y' if you have completed the log-in or the human verification, or 'n' to check again: ").lower()
-                except EOFError:
-                    # Print error message and exit the program in case of an End-Of-File condition on input
-                    print("Error reading input. Exiting the program.")
-                    raise SystemExit("Failed to read user input.")  # Exiting the program due to input error
-
-                # Check the user's input and act accordingly
-                if user_input == 'y':
-                    print("Continuing with the automation process...")
-                    break  # Break the loop to continue with automation
-                elif user_input == 'n':
-                    print("Waiting for you to complete the human verification...")
-                    time.sleep(5)  # Waiting for a specified time before asking again
-                else:
-                    print("Invalid input. Please enter 'y' or 'n'.")  # Handle invalid input
 
     def write_last_answer_custom_file(self, filename):
         """
@@ -663,7 +632,7 @@ class ChatGPTAutomation:
             logging.info("Responding...")
             time.sleep(self.DelayTimes.CHECK_RESPONSE_STATUS_DELAY)
 
-    def switch_model(self, model_name: float):
+    def switch_model(self, model_name: str):
         """
         Switches between different ChatGPT models in the application's user interface.
 
@@ -678,7 +647,7 @@ class ChatGPTAutomation:
         menu_element.click()
 
         # Wait for the submenu to be visible (adjust timeout as needed)
-        if model_name == 4:
+        if model_name == "4":
             submenu_locator = ChatGPTLocators.CHAT_GPT_SWITCH_TO_4
             try:
                 # Check for the UPGRADE_TO_PLUS_BTN
@@ -686,12 +655,18 @@ class ChatGPTAutomation:
                 raise Exception("You must upgrade your ChatGPT account to plus")
             except NoSuchElementException:
                 pass
-        elif model_name == 3:
+        elif model_name == "3.5":
             submenu_locator = ChatGPTLocators.CHAT_GPT_SWITCH_TO_3
+        elif model_name == "4o":
+            submenu_locator = ChatGPTLocators.CHAT_GPT_SWITCH_TO_4O
+            try:
+                # Check for the UPGRADE_TO_PLUS_BTN
+                self.driver.find_element(*ChatGPTLocators.UPGRADE_TO_PLUS_BTN)
+                raise Exception("You must upgrade your ChatGPT account to plus")
+            except NoSuchElementException:
+                pass
         else:
             raise Exception("To switch between models, you need to set the 'model_name' to 3.5 or 4")
-
-
         
         submenu_element = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(submenu_locator))
 
@@ -731,27 +706,6 @@ class ChatGPTAutomation:
             logging.error(f"Unexpected error when trying to find Chrome: {e}")
 
         return None
-
-    # def check_verify_page(self):
-    #     try:
-    #         element = self.driver.find_element(By.XPATH, f'//*[contains(text(), "Verify you are human")]')
-    #         return True
-    #     except NoSuchElementException:
-    #         return False
-    #     except Exception as e:
-    #         logging.error(f"unexpected error: {e}")
-    #         raise Exception(e)
-
-    # def pass_verify(self):
-    #     try:
-    #         checkbox = driver.find_element(By.CSS_SELECTOR, 'input[type="checkbox"]')
-    #         if not checkbox.is_selected():
-    #             checkbox.click()
-            
-    #         time.sleep(15)
-    #     except NoSuchElementException:
-    #         logging.error("Check Box for human verify doesn't find!")
-    #         raise Exception("Check Box for human verify doesn't find!")
         
     def quit(self):
         """
@@ -861,3 +815,10 @@ class ChatGPTAutomation:
                         time.sleep(5)  # Waiting for a specified time before asking again
                     else:
                         print("Invalid input. Please enter 'y' or 'n'.")  # Handle invalid input
+
+    def type_in_selected_area(self, text:str ,element):
+        for char in text:
+            if char == "\n":
+                element.send_keys(Keys.SHIFT + Keys.ENTER)
+            else:
+                element.send_keys(char)
