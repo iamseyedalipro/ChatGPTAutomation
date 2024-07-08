@@ -5,3 +5,4 @@ requests==2.31.0
 selenium==4.9.0
 webdriver-manager==4.0.1
 pyperclip==1.9.0
+PyAutoIt==0.6.5
