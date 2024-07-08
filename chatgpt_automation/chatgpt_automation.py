@@ -15,6 +15,8 @@ import logging
 import platform
 import pyperclip
 from chatgpt_automation.chromedriver_manager import ChromeDriverManager
+import autoit
+
 # Configure logging
 logging.basicConfig(filename='chatgpt_automation.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
@@ -26,7 +28,7 @@ class ChatGPTLocators:
 
     SEND_MSG_BTN = (By.XPATH, "//*[contains(@data-testid, 'send-button')]")
 
-    GPT4_FILE_INPUT = (By.CSS_SELECTOR, 'input.hidden')
+    GPT4_FILE_INPUT = (By.XPATH, '//input[@class="hidden"]')
 
     CHAT_GPT_CONVERSION = (By.CSS_SELECTOR, 'div.text-base')
     REGENERATE_BTN = (By.CSS_SELECTOR, 'button[as="button"]')
@@ -64,6 +66,8 @@ class ChatGPTLocators:
 
     RESPONSE_DIV = (By.CLASS_NAME, "markdown")
 
+    FILE_UPLOAD_BTN = (By.XPATH, "//button[@aria-disabled='false']")
+    FILE_UPLOAD_BTN_SELECT_SUB_MENU = (By.XPATH, "//div[@role='menuitem' and contains(text(), 'Upload from computer')]")
 class ChatGPTAutomation:
     class DelayTimes:
         CONSTRUCTOR_DELAY = 6
@@ -330,7 +334,7 @@ class ChatGPTAutomation:
     def upload_file_for_prompt(self, file_name):
         """
         Uploads a file to ChatGPT via the web interface. This function automates the process of
-        selecting a file for upload through the ChatGPT's file input element.
+        selecting a file for     through the ChatGPT's file input element.
 
         Args:
             file_name (str): The name of the file to be uploaded.
@@ -349,14 +353,22 @@ class ChatGPTAutomation:
 
             # Locate the file input element on the webpage
             try:
-                file_input = self.driver.find_element(*ChatGPTLocators.GPT4_FILE_INPUT)
+                file_input = self.driver.find_element(*ChatGPTLocators.FILE_UPLOAD_BTN)
+                file_input.click()
+                time.sleep(2)
+                self.driver.find_element(*ChatGPTLocators.FILE_UPLOAD_BTN_SELECT_SUB_MENU).click()
+                time.sleep(2)
+                autoit.control_send("[CLASS:#32770]", "Edit1", file_path)
+                autoit.control_click("[CLASS:#32770]", "Button1")
             except NoSuchElementException:
                 raise Exception(
                     "You must using gpt4 for upload the files for switch you can using 'switch_model' function!"
                 )
-            # Send the file path to the file input element, initiating the upload
-            file_input.send_keys(file_path)
+            except Exception as e:
+                logging.error(e)
+                raise e
             # Wait for the upload process to complete (10 seconds)
+
             time.sleep(self.DelayTimes.UPLOAD_FILE_DELAY)
         except FileNotFoundError as e:
             # Log the exception if the file is not found
