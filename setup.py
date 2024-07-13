@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='ChatGPTAutomation',
-    version='0.7.2',
+    version='0.7.3',
     author='Seyed Ali Hosseini',
     author_email='iamseyedalipro@gmail.com',
     description='A Python package for automating interactions with ChatGPT using Selenium. Chatgpt automation without api. Chatgptautomation',
@@ -25,6 +25,36 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10'
     ],
-    keywords='chatgpt automation selenium openai chatbot test automation webdriver gpt-3 automation gpt-4 automation file upload automation chat history retrieval login automation developers QA testers automation engineers pytest robot framework python library automation library best chatgpt automation tool selenium chatgpt integration',
+    keywords=[
+        'ChatGPT automation',
+        'Chatgpt Automation without api',
+        "chatgpt selenium",
+        "chatgpt selenium automation",
+        'Selenium integration',
+        'OpenAI chatbot',
+        'test automation',
+        'web automation',
+        'GPT-3',
+        'GPT-4',
+        'file upload automation',
+        'chat history retrieval',
+        'login automation',
+        'software testing',
+        'QA tools',
+        'automation engineers',
+        'Python library',
+        'automation framework',
+        'pytest integration',
+        'robot framework',
+        'browser automation',
+        'automated testing',
+        'AI chatbot automation',
+        'web driver tools'
+    ]
     python_requires='>=3.8',
+    project_urls={
+        'Documentation': 'https://github.com/iamseyedalipro/ChatGPTAutomation#readme',
+        'Source': 'https://github.com/iamseyedalipro/ChatGPTAutomation',
+        'Tracker': 'https://github.com/iamseyedalipro/ChatGPTAutomation/issues'
+    }
 )

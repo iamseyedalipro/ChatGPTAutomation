@@ -68,6 +68,11 @@ class ChatGPTLocators:
 
     FILE_UPLOAD_BTN = (By.XPATH, "//button[@aria-disabled='false']")
     FILE_UPLOAD_BTN_SELECT_SUB_MENU = (By.XPATH, "//div[@role='menuitem' and contains(text(), 'Upload from computer')]")
+
+    ERROR_DIALOG_CLASS_NAME = (By.CSS_SELECTOR, ".toast-root")
+
+    UPLOADING_PROCESS = (By.TAG_NAME, 'circle')
+
 class ChatGPTAutomation:
     class DelayTimes:
         CONSTRUCTOR_DELAY = 6
@@ -324,34 +329,25 @@ class ChatGPTAutomation:
             # Raising a WebDriverException to indicate failure in sending the prompt
             raise WebDriverException(f"Error sending prompt to ChatGPT: {e}")
 
-    def check_message_sent(self):
-        try:
-            self.driver.find_element(*ChatGPTLocators.SEND_MSG_BTN)
-            return False
-        except:
-            return True
-
-    def upload_file_for_prompt(self, file_name):
+    def upload_file_for_prompt(self, file_name, retry_count=1):
         """
         Uploads a file to ChatGPT via the web interface. This function automates the process of
-        selecting a file for     through the ChatGPT's file input element.
+        selecting a file for upload through the ChatGPT's file input element.
 
         Args:
             file_name (str): The name of the file to be uploaded.
+            retry_count (int): Number of times to retry the upload in case of an error.
 
         Raises:
             FileNotFoundError: If the specified file does not exist in the current working directory.
             WebDriverException: If there is an issue interacting with the file upload element on the web page.
         """
-        try:
-            # Construct the full file path using the current working directory
-            file_path = os.path.join(os.getcwd(), file_name)
 
-            # Check if the file exists before attempting to upload
+        def check_file_exists(file_path):
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"The file '{file_path}' does not exist.")
 
-            # Locate the file input element on the webpage
+        def perform_file_upload(file_path):
             try:
                 file_input = self.driver.find_element(*ChatGPTLocators.FILE_UPLOAD_BTN)
                 file_input.click()
@@ -362,24 +358,41 @@ class ChatGPTAutomation:
                 autoit.control_click("[CLASS:#32770]", "Button1")
             except NoSuchElementException:
                 raise Exception(
-                    "You must using gpt4 for upload the files for switch you can using 'switch_model' function!"
+                    "You must be using GPT-4 to upload files. To switch, you can use the 'switch_model' function!"
                 )
             except Exception as e:
                 logging.error(e)
                 raise e
-            # Wait for the upload process to complete (10 seconds)
-
             time.sleep(self.DelayTimes.UPLOAD_FILE_DELAY)
-        except FileNotFoundError as e:
-            # Log the exception if the file is not found
-            logging.error(f"File not found for upload: {e}")
-            # Re-raise the exception to be handled by the calling code
-            raise
-        except Exception as e:
-            # Log any other exception that occurs during the file upload process
-            logging.error(f"Failed to upload file to ChatGPT: {e}")
-            # Raising a WebDriverException to indicate failure in file upload
-            raise WebDriverException(f"Error uploading file to ChatGPT: {e}")
+
+        def verify_upload(file_name):
+            if self.check_dialog_error():
+                raise WebDriverException("Error dialog detected during file upload.")
+            print(file_name)
+            if not self.check_upload_success(file_name):
+                raise WebDriverException("File upload was not successful. The file is not listed on the page.")
+
+        check_file_exists(file_name)
+
+
+        for attempt in range(1, retry_count + 1):
+            try:
+                logging.info(f"Attempt {attempt} to upload file.")
+                perform_file_upload(file_name)
+                time.sleep(self.DelayTimes.UPLOAD_FILE_DELAY)
+                
+                verify_upload(file_name.split('\\')[-1])
+                logging.info("File upload successful.")
+                return  # Exit the function if the upload is successful
+            except WebDriverException as e:
+                logging.error(f"Upload attempt {attempt} failed: {e}")
+                if attempt == retry_count:
+                    logging.error("All retry attempts failed.")
+                    raise WebDriverException(f"All retry attempts failed: {e}")
+
+        raise WebDriverException("File upload failed after all retry attempts.")
+
+
 
     def return_chatgpt_conversation(self):
         """
@@ -888,3 +901,19 @@ class ChatGPTAutomation:
                 element.send_keys(Keys.SHIFT + Keys.ENTER)
             else:
                 element.send_keys(char)
+
+
+    def check_dialog_error(self):
+        try:
+            error_dialog = self.driver.find_element(*ChatGPTLocators.ERROR_DIALOG_CLASS_NAME)
+        except NoSuchElementException:
+            return False
+        return True
+
+    def check_upload_success(self, file_name):
+        try:
+            self.driver.find_element(By.XPATH, f"//div[text()='{file_name}']")
+        except NoSuchElementException:
+            return False
+        return True
+    
