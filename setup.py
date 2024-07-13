@@ -50,7 +50,7 @@ setup(
         'automated testing',
         'AI chatbot automation',
         'web driver tools'
-    ]
+    ],
     python_requires='>=3.8',
     project_urls={
         'Documentation': 'https://github.com/iamseyedalipro/ChatGPTAutomation#readme',
